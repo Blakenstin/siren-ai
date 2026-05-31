@@ -1,0 +1,617 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SIREN AI — Safety Intelligence & Response Emergency Network</title>
+  <meta name="description" content="Nigeria's AI-powered community crisis prediction and rapid response network. Monitor threats, coordinate response, and protect communities across all 36 states.">
+  <meta name="theme-color" content="#15803D">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.34.0/dist/tabler-icons.min.css">
+  <style>
+    :root {
+      --font-sans: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      --color-text-primary: #111827;
+      --color-text-secondary: #6B7280;
+      --color-background-primary: #ffffff;
+      --color-background-secondary: #F9FAFB;
+      --color-border-primary: #D1D5DB;
+      --color-border-secondary: #E5E7EB;
+      --color-border-tertiary: #F3F4F6;
+    }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: var(--font-sans);
+      background: linear-gradient(180deg, #ECFDF5 0%, #F3F4F6 120px);
+      color: var(--color-text-primary);
+      min-height: 100vh;
+    }
+    .page-wrap { max-width: 1100px; margin: 0 auto; padding: 0 1rem 2rem; }
+* { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: var(--font-sans); background: transparent; }
+
+  .shell { padding: 1rem 0 2rem; }
+
+  /* ── top nav ── */
+  .topbar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 10px; }
+  .logo { display: flex; align-items: center; gap: 8px; }
+  .logo-mark { width: 32px; height: 32px; border-radius: 8px; background: #15803D; display: flex; align-items: center; justify-content: center; }
+  .logo-mark i { color: #fff; font-size: 16px; }
+  .logo-name { font-size: 16px; font-weight: 500; color: var(--color-text-primary); letter-spacing: -.01em; }
+  .logo-tag { font-size: 11px; color: var(--color-text-secondary); }
+  .live-pill { display: flex; align-items: center; gap: 6px; background: #DCFCE7; color: #15803D; font-size: 11px; font-weight: 500; padding: 5px 12px; border-radius: 999px; border: 1px solid #86EFAC; }
+  .live-dot { width: 6px; height: 6px; border-radius: 50%; background: #16A34A; animation: blink 1.2s ease-in-out infinite; }
+  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.3} }
+
+  /* ── nav tabs ── */
+  .tabs { display: flex; gap: 4px; background: var(--color-background-secondary); border-radius: 10px; padding: 4px; margin-bottom: 1.5rem; flex-wrap: wrap; }
+  .tab { flex: 1; min-width: 80px; font-size: 12px; padding: 7px 10px; border-radius: 7px; border: none; background: transparent; color: var(--color-text-secondary); cursor: pointer; font-family: var(--font-sans); transition: all .15s; text-align: center; }
+  .tab.active { background: var(--color-background-primary); color: var(--color-text-primary); box-shadow: 0 1px 3px rgba(0,0,0,.08); border: 0.5px solid var(--color-border-tertiary); }
+
+  /* ── panels ── */
+  .panel { display: none; }
+  .panel.active { display: block; }
+
+  /* ── grid helpers ── */
+  .g2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .g3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
+  .g4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+  @media(max-width:520px) { .g2,.g3,.g4 { grid-template-columns: 1fr 1fr; } }
+
+  /* ── cards ── */
+  .card { background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary); border-radius: 12px; padding: 1rem 1.1rem; }
+  .card-hd { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+  .card-title { font-size: 12px; font-weight: 500; color: var(--color-text-secondary); text-transform: uppercase; letter-spacing: .05em; }
+  .metric { font-size: 26px; font-weight: 500; color: var(--color-text-primary); line-height: 1; }
+  .metric-sub { font-size: 12px; color: var(--color-text-secondary); margin-top: 4px; }
+  .delta-up { font-size: 11px; color: #16A34A; }
+  .delta-dn { font-size: 11px; color: #DC2626; }
+
+  /* ── threat list ── */
+  .threat-list { display: flex; flex-direction: column; gap: 8px; }
+  .threat-item { display: flex; align-items: flex-start; gap: 10px; padding: 10px; background: var(--color-background-secondary); border-radius: 8px; border: 0.5px solid var(--color-border-tertiary); cursor: pointer; transition: border-color .15s; }
+  .threat-item:hover { border-color: var(--color-border-primary); }
+  .threat-dot { width: 10px; height: 10px; border-radius: 50%; margin-top: 4px; flex-shrink: 0; }
+  .dot-red { background: #EF4444; }
+  .dot-amber { background: #F59E0B; }
+  .dot-green { background: #22C55E; }
+  .dot-blue { background: #3B82F6; }
+  .threat-lbl { font-size: 13px; font-weight: 500; color: var(--color-text-primary); }
+  .threat-meta { font-size: 11px; color: var(--color-text-secondary); margin-top: 2px; }
+  .threat-badge { margin-left: auto; font-size: 10px; padding: 2px 8px; border-radius: 999px; font-weight: 500; white-space: nowrap; }
+  .badge-red { background: #FEE2E2; color: #991B1B; }
+  .badge-amber { background: #FEF3C7; color: #92400E; }
+  .badge-green { background: #DCFCE7; color: #166534; }
+  .badge-blue { background: #DBEAFE; color: #1E40AF; }
+
+  /* ── signal feed ── */
+  .feed { display: flex; flex-direction: column; gap: 6px; max-height: 360px; overflow-y: auto; }
+  .feed-item { padding: 8px 10px; background: var(--color-background-secondary); border-radius: 8px; border-left: 3px solid transparent; font-size: 12px; line-height: 1.5; }
+  .feed-item.red { border-left-color: #EF4444; }
+  .feed-item.amber { border-left-color: #F59E0B; }
+  .feed-item.green { border-left-color: #22C55E; }
+  .feed-src { font-size: 10px; color: var(--color-text-secondary); margin-top: 3px; }
+
+  /* ── Nigeria map (SVG) ── */
+  .map-wrap { position: relative; width: 100%; }
+
+  /* ── progress bars ── */
+  .pb-row { margin-bottom: 10px; }
+  .pb-label { display: flex; justify-content: space-between; font-size: 12px; color: var(--color-text-secondary); margin-bottom: 4px; }
+  .pb-track { height: 6px; background: var(--color-background-secondary); border-radius: 999px; overflow: hidden; }
+  .pb-fill { height: 100%; border-radius: 999px; transition: width .4s; }
+
+  /* ── response timeline ── */
+  .timeline { display: flex; flex-direction: column; gap: 0; }
+  .tl-item { display: flex; gap: 12px; }
+  .tl-spine { display: flex; flex-direction: column; align-items: center; }
+  .tl-circle { width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 12px; font-weight: 500; }
+  .tl-line { width: 1px; flex: 1; min-height: 20px; background: var(--color-border-tertiary); margin: 3px 0; }
+  .tl-content { padding-bottom: 16px; flex: 1; }
+  .tl-title { font-size: 13px; font-weight: 500; color: var(--color-text-primary); }
+  .tl-desc { font-size: 12px; color: var(--color-text-secondary); line-height: 1.5; margin-top: 2px; }
+  .tl-time { font-size: 11px; color: var(--color-text-secondary); margin-top: 3px; }
+
+  /* ── USSD mockup ── */
+  .phone { background: #1a1a2e; border-radius: 20px; padding: 16px; max-width: 260px; margin: 0 auto; border: 3px solid #333; }
+  .phone-screen { background: #000; border-radius: 10px; padding: 14px; min-height: 180px; font-family: monospace; font-size: 12px; color: #0f0; line-height: 1.6; }
+  .phone-btns { display: flex; justify-content: center; gap: 16px; margin-top: 12px; }
+  .phone-btn { width: 36px; height: 36px; border-radius: 50%; border: 1px solid #444; background: #222; color: #ccc; font-size: 12px; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+
+  /* ── WhatsApp mini ── */
+  .wa { background: #ece5dd; border-radius: 10px; padding: 10px; display: flex; flex-direction: column; gap: 6px; }
+  .wa-msg { max-width: 85%; padding: 7px 10px; border-radius: 8px; font-size: 12px; line-height: 1.5; }
+  .wa-in { background: #fff; align-self: flex-start; border-radius: 0 8px 8px 8px; color: #111; }
+  .wa-out { background: #dcf8c6; align-self: flex-end; border-radius: 8px 0 8px 8px; color: #111; }
+  .wa-t { font-size: 10px; color: #888; margin-top: 2px; text-align: right; }
+
+  /* ── section label ── */
+  .sec-lbl { font-size: 11px; font-weight: 500; color: var(--color-text-secondary); text-transform: uppercase; letter-spacing: .05em; margin-bottom: 10px; }
+
+  /* ── risk gauge ── */
+  canvas#gauge { display: block; margin: 0 auto; }
+
+  /* ── chart bars ── */
+  .bar-chart { display: flex; flex-direction: column; gap: 6px; }
+  .bar-row { display: flex; align-items: center; gap: 8px; }
+  .bar-lbl { font-size: 11px; color: var(--color-text-secondary); min-width: 70px; }
+  .bar-track { flex: 1; height: 8px; background: var(--color-background-secondary); border-radius: 4px; overflow: hidden; }
+  .bar-fill { height: 100%; border-radius: 4px; }
+  .bar-val { font-size: 11px; color: var(--color-text-secondary); min-width: 28px; text-align: right; }
+
+  .btn { font-size: 12px; padding: 7px 16px; border-radius: 8px; border: 0.5px solid var(--color-border-secondary); background: var(--color-background-primary); color: var(--color-text-primary); cursor: pointer; font-family: var(--font-sans); transition: all .15s; }
+  .btn:hover { background: var(--color-background-secondary); }
+  .btn-primary { background: #15803D; color: #fff; border-color: #15803D; }
+  .btn-primary:hover { background: #166534; }
+  .btn-danger { background: #DC2626; color: #fff; border-color: #DC2626; }
+
+  .divider { height: 0.5px; background: var(--color-border-tertiary); margin: 12px 0; }
+
+  .sm { font-size: 11px; color: var(--color-text-secondary); }
+  </style>
+</head>
+<body>
+<div class="page-wrap">
+<div class="shell">
+  <div class="topbar">
+    <div class="logo">
+      <div class="logo-mark"><i class="ti ti-radar" aria-hidden="true"></i></div>
+      <div>
+        <div class="logo-name">SIREN AI</div>
+        <div class="logo-tag">Safety Intelligence & Response Emergency Network</div>
+      </div>
+    </div>
+    <div style="display:flex;gap:8px;align-items:center">
+      <div class="live-pill"><div class="live-dot"></div> LIVE · Lagos Control</div>
+      <button class="btn btn-danger" style="font-size:11px;padding:5px 12px" onclick="panicDemo()"><i class="ti ti-alert-triangle" aria-hidden="true"></i> PANIC</button>
+    </div>
+  </div>
+
+  <div class="tabs">
+    <button class="tab active" onclick="tab(this,'dashboard')"><i class="ti ti-layout-dashboard" aria-hidden="true"></i> Dashboard</button>
+    <button class="tab" onclick="tab(this,'signals')"><i class="ti ti-antenna" aria-hidden="true"></i> Signals</button>
+    <button class="tab" onclick="tab(this,'response')"><i class="ti ti-bolt" aria-hidden="true"></i> Response</button>
+    <button class="tab" onclick="tab(this,'citizen')"><i class="ti ti-device-mobile" aria-hidden="true"></i> Citizen</button>
+    <button class="tab" onclick="tab(this,'predict')"><i class="ti ti-brain" aria-hidden="true"></i> Predict</button>
+  </div>
+
+  <!-- DASHBOARD -->
+  <div class="panel active" id="panel-dashboard">
+    <div class="g4" style="margin-bottom:12px">
+      <div class="card">
+        <div class="card-title">Active Threats</div>
+        <div class="metric" style="color:#EF4444">3</div>
+        <div class="metric-sub delta-dn">↑ 1 from yesterday</div>
+      </div>
+      <div class="card">
+        <div class="card-title">Signals/hr</div>
+        <div class="metric">1,240</div>
+        <div class="metric-sub delta-up">↑ 8% vs avg</div>
+      </div>
+      <div class="card">
+        <div class="card-title">Responders Live</div>
+        <div class="metric" style="color:#16A34A">47</div>
+        <div class="metric-sub">across 12 LGAs</div>
+      </div>
+      <div class="card">
+        <div class="card-title">Lives Impacted</div>
+        <div class="metric">2.4M</div>
+        <div class="metric-sub">this month</div>
+      </div>
+    </div>
+
+    <div class="g2">
+      <div class="card">
+        <div class="card-hd"><span class="card-title">Active alerts · Nigeria</span><span class="sm">Live</span></div>
+        <div class="threat-list">
+          <div class="threat-item" onclick="zoomThreat(0)">
+            <div class="threat-dot dot-red"></div>
+            <div style="flex:1">
+              <div class="threat-lbl">Communal tension — Plateau State</div>
+              <div class="threat-meta">Escalating fast · detected 3hrs ago · 48hr prediction window</div>
+            </div>
+            <span class="threat-badge badge-red">CRITICAL</span>
+          </div>
+          <div class="threat-item" onclick="zoomThreat(1)">
+            <div class="threat-dot dot-amber"></div>
+            <div style="flex:1">
+              <div class="threat-lbl">Cholera outbreak signal — Kano LGA</div>
+              <div class="threat-meta">6 signal sources · 72hr window · Health teams alerted</div>
+            </div>
+            <span class="threat-badge badge-amber">WATCH</span>
+          </div>
+          <div class="threat-item" onclick="zoomThreat(2)">
+            <div class="threat-dot dot-amber"></div>
+            <div style="flex:1">
+              <div class="threat-lbl">Flash flood risk — Lokoja (River Niger)</div>
+              <div class="threat-meta">Rainfall + satellite data · 24hr warning</div>
+            </div>
+            <span class="threat-badge badge-amber">WATCH</span>
+          </div>
+          <div class="threat-item" onclick="zoomThreat(3)">
+            <div class="threat-dot dot-green"></div>
+            <div style="flex:1">
+              <div class="threat-lbl">Food scarcity — NE Borno (resolved)</div>
+              <div class="threat-meta">WFP distribution completed · 18,000 beneficiaries</div>
+            </div>
+            <span class="threat-badge badge-green">RESOLVED</span>
+          </div>
+          <div class="threat-item">
+            <div class="threat-dot dot-blue"></div>
+            <div style="flex:1">
+              <div class="threat-lbl">Protest monitoring — Abuja CBD</div>
+              <div class="threat-meta">Peaceful · 3,000+ attendees · Police presence normal</div>
+            </div>
+            <span class="threat-badge badge-blue">MONITOR</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-hd"><span class="card-title">Signal breakdown</span><span class="sm" id="sig-time">Last 24 hrs</span></div>
+        <div class="bar-chart" style="margin-bottom:14px">
+          <div class="bar-row"><span class="bar-lbl">Social media</span><div class="bar-track"><div class="bar-fill" style="width:82%;background:#3B82F6"></div></div><span class="bar-val">82%</span></div>
+          <div class="bar-row"><span class="bar-lbl">Citizen reports</span><div class="bar-track"><div class="bar-fill" style="width:58%;background:#8B5CF6"></div></div><span class="bar-val">58%</span></div>
+          <div class="bar-row"><span class="bar-lbl">Radio broadcast</span><div class="bar-track"><div class="bar-fill" style="width:41%;background:#F59E0B"></div></div><span class="bar-val">41%</span></div>
+          <div class="bar-row"><span class="bar-lbl">Satellite / GIS</span><div class="bar-track"><div class="bar-fill" style="width:34%;background:#10B981"></div></div><span class="bar-val">34%</span></div>
+          <div class="bar-row"><span class="bar-lbl">Health facilities</span><div class="bar-track"><div class="bar-fill" style="width:19%;background:#EF4444"></div></div><span class="bar-val">19%</span></div>
+          <div class="bar-row"><span class="bar-lbl">News portals</span><div class="bar-track"><div class="bar-fill" style="width:27%;background:#6366F1"></div></div><span class="bar-val">27%</span></div>
+        </div>
+        <div class="divider"></div>
+        <div class="sec-lbl">Response speed</div>
+        <div class="pb-row"><div class="pb-label"><span>Detection → Alert</span><span style="color:#16A34A">avg 4.2 min</span></div><div class="pb-track"><div class="pb-fill" style="width:88%;background:#16A34A"></div></div></div>
+        <div class="pb-row"><div class="pb-label"><span>Alert → First responder</span><span style="color:#F59E0B">avg 18 min</span></div><div class="pb-track"><div class="pb-fill" style="width:62%;background:#F59E0B"></div></div></div>
+        <div class="pb-row"><div class="pb-label"><span>Prediction accuracy</span><span style="color:#3B82F6">79%</span></div><div class="pb-track"><div class="pb-fill" style="width:79%;background:#3B82F6"></div></div></div>
+      </div>
+    </div>
+
+    <div id="threat-detail" style="display:none;margin-top:12px"></div>
+  </div>
+
+  <!-- SIGNALS -->
+  <div class="panel" id="panel-signals">
+    <div class="g2" style="margin-bottom:12px">
+      <div class="card">
+        <div class="card-hd"><span class="card-title">Live signal stream</span><div class="live-pill" style="font-size:10px"><div class="live-dot"></div> real-time</div></div>
+        <div class="feed" id="signal-feed"></div>
+      </div>
+      <div>
+        <div class="card" style="margin-bottom:12px">
+          <div class="card-title" style="margin-bottom:10px">Signal sources active</div>
+          <div style="display:flex;flex-wrap:wrap;gap:6px">
+            <span style="font-size:11px;padding:4px 10px;background:#DBEAFE;color:#1E40AF;border-radius:999px">Twitter/X Nigeria</span>
+            <span style="font-size:11px;padding:4px 10px;background:#F3E8FF;color:#6B21A8;border-radius:999px">Facebook Groups</span>
+            <span style="font-size:11px;padding:4px 10px;background:#FEF3C7;color:#92400E;border-radius:999px">Radio (NTA/AIT)</span>
+            <span style="font-size:11px;padding:4px 10px;background:#DCFCE7;color:#166534;border-radius:999px">Sentinel-2 Satellite</span>
+            <span style="font-size:11px;padding:4px 10px;background:#FEE2E2;color:#991B1B;border-radius:999px">NCDC Health Reports</span>
+            <span style="font-size:11px;padding:4px 10px;background:#E0F2FE;color:#0C4A6E;border-radius:999px">NIMET Weather</span>
+            <span style="font-size:11px;padding:4px 10px;background:#FFF7ED;color:#9A3412;border-radius:999px">Citizen USSD Reports</span>
+            <span style="font-size:11px;padding:4px 10px;background:#F0FDF4;color:#14532D;border-radius:999px">WhatsApp AI Hotline</span>
+            <span style="font-size:11px;padding:4px 10px;background:#F5F3FF;color:#4C1D95;border-radius:999px">Telegram Communities</span>
+            <span style="font-size:11px;padding:4px 10px;background:#ECFDF5;color:#065F46;border-radius:999px">NiMet River Gauges</span>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-title" style="margin-bottom:10px">NLP language breakdown</div>
+          <div class="bar-chart">
+            <div class="bar-row"><span class="bar-lbl">English</span><div class="bar-track"><div class="bar-fill" style="width:44%;background:#3B82F6"></div></div><span class="bar-val">44%</span></div>
+            <div class="bar-row"><span class="bar-lbl">Pidgin</span><div class="bar-track"><div class="bar-fill" style="width:28%;background:#8B5CF6"></div></div><span class="bar-val">28%</span></div>
+            <div class="bar-row"><span class="bar-lbl">Hausa</span><div class="bar-track"><div class="bar-fill" style="width:14%;background:#F59E0B"></div></div><span class="bar-val">14%</span></div>
+            <div class="bar-row"><span class="bar-lbl">Yoruba</span><div class="bar-track"><div class="bar-fill" style="width:9%;background:#10B981"></div></div><span class="bar-val">9%</span></div>
+            <div class="bar-row"><span class="bar-lbl">Igbo</span><div class="bar-track"><div class="bar-fill" style="width:5%;background:#EF4444"></div></div><span class="bar-val">5%</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- RESPONSE -->
+  <div class="panel" id="panel-response">
+    <div class="g2">
+      <div class="card">
+        <div class="card-hd"><span class="card-title">Automated response — Plateau crisis</span></div>
+        <div class="timeline">
+          <div class="tl-item">
+            <div class="tl-spine"><div class="tl-circle" style="background:#DCFCE7;color:#166534"><i class="ti ti-check" aria-hidden="true"></i></div><div class="tl-line"></div></div>
+            <div class="tl-content"><div class="tl-title">Threat detected</div><div class="tl-desc">82 signal correlations across 4 sources. Confidence: 91%</div><div class="tl-time">Today 09:14 AM</div></div>
+          </div>
+          <div class="tl-item">
+            <div class="tl-spine"><div class="tl-circle" style="background:#DCFCE7;color:#166534"><i class="ti ti-check" aria-hidden="true"></i></div><div class="tl-line"></div></div>
+            <div class="tl-content"><div class="tl-title">AI alert issued</div><div class="tl-desc">SMS + WhatsApp sent to 12 community leaders, 3 NGOs, Plateau State command</div><div class="tl-time">Today 09:18 AM</div></div>
+          </div>
+          <div class="tl-item">
+            <div class="tl-spine"><div class="tl-circle" style="background:#DCFCE7;color:#166534"><i class="ti ti-check" aria-hidden="true"></i></div><div class="tl-line"></div></div>
+            <div class="tl-content"><div class="tl-title">Resources pre-positioned</div><div class="tl-desc">Medical team + relief supplies routed to Jos via AI logistics optimizer</div><div class="tl-time">Today 10:45 AM</div></div>
+          </div>
+          <div class="tl-item">
+            <div class="tl-spine"><div class="tl-circle" style="background:#FEF3C7;color:#92400E;animation:blink 1s infinite"><i class="ti ti-clock" aria-hidden="true"></i></div><div class="tl-line"></div></div>
+            <div class="tl-content"><div class="tl-title">De-escalation in progress</div><div class="tl-desc">Traditional rulers convened. Radio broadcast in Hausa/Berom underway</div><div class="tl-time">Today 12:30 PM — ongoing</div></div>
+          </div>
+          <div class="tl-item">
+            <div class="tl-spine"><div class="tl-circle" style="background:var(--color-background-secondary);color:var(--color-text-secondary)"><i class="ti ti-circle-dashed" aria-hidden="true"></i></div></div>
+            <div class="tl-content"><div class="tl-title" style="color:var(--color-text-secondary)">Crisis resolution + debrief</div><div class="tl-desc" style="color:var(--color-text-secondary)">AI-generated incident report + lessons learned</div><div class="tl-time">Pending</div></div>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <div class="card" style="margin-bottom:12px">
+          <div class="card-title" style="margin-bottom:12px">Response network</div>
+          <div style="display:flex;flex-direction:column;gap:8px">
+            <div style="display:flex;justify-content:space-between;align-items:center;font-size:13px">
+              <span><i class="ti ti-building-hospital" aria-hidden="true" style="color:#EF4444;margin-right:6px"></i>Hospitals on standby</span><strong>24</strong>
+            </div>
+            <div style="display:flex;justify-content:space-between;align-items:center;font-size:13px">
+              <span><i class="ti ti-users" aria-hidden="true" style="color:#8B5CF6;margin-right:6px"></i>NGO partners active</span><strong>31</strong>
+            </div>
+            <div style="display:flex;justify-content:space-between;align-items:center;font-size:13px">
+              <span><i class="ti ti-truck" aria-hidden="true" style="color:#F59E0B;margin-right:6px"></i>Supply vehicles tracked</span><strong>8</strong>
+            </div>
+            <div style="display:flex;justify-content:space-between;align-items:center;font-size:13px">
+              <span><i class="ti ti-radio" aria-hidden="true" style="color:#3B82F6;margin-right:6px"></i>Radio stations broadcasting</span><strong>6</strong>
+            </div>
+            <div style="display:flex;justify-content:space-between;align-items:center;font-size:13px">
+              <span><i class="ti ti-message-chatbot" aria-hidden="true" style="color:#16A34A;margin-right:6px"></i>Community leaders engaged</span><strong>42</strong>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-title" style="margin-bottom:10px">Send alert</div>
+          <div style="display:flex;flex-direction:column;gap:8px">
+            <select style="font-size:12px;padding:7px;border-radius:8px;border:0.5px solid var(--color-border-secondary);background:var(--color-background-primary);color:var(--color-text-primary);font-family:var(--font-sans)">
+              <option>All stakeholders</option>
+              <option>Government only</option>
+              <option>NGOs only</option>
+              <option>Community leaders</option>
+              <option>Media partners</option>
+            </select>
+            <textarea style="font-size:12px;padding:8px;border-radius:8px;border:0.5px solid var(--color-border-secondary);background:var(--color-background-primary);color:var(--color-text-primary);font-family:var(--font-sans);resize:none;height:60px" placeholder="AI-drafted message appears here...">⚠️ SIREN Alert: Elevated tension detected in Plateau. Community leaders requested to convene. NGO teams on standby. Full brief in SIREN dashboard.</textarea>
+            <div style="display:flex;gap:8px">
+              <button class="btn" style="flex:1;font-size:12px">Translate (Hausa)</button>
+              <button class="btn btn-primary" style="flex:1;font-size:12px">Send to all ↗</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CITIZEN -->
+  <div class="panel" id="panel-citizen">
+    <div class="g2">
+      <div class="card">
+        <div class="card-hd"><span class="card-title">USSD panic button — *737*SAFE#</span></div>
+        <div class="phone">
+          <div class="phone-screen" id="ussd-screen">
+            <span>SIREN SAFETY NETWORK</span><br>
+            <span>*737*SAFE# activated</span><br><br>
+            <span>Select:</span><br>
+            <span>1. Report emergency</span><br>
+            <span>2. Request evacuation</span><br>
+            <span>3. Find nearest shelter</span><br>
+            <span>4. Missing person alert</span><br><br>
+            <span id="ussd-reply" style="color:#ff0">></span>
+          </div>
+          <div class="phone-btns">
+            <div class="phone-btn" onclick="ussdPress(1)">1</div>
+            <div class="phone-btn" onclick="ussdPress(2)">2</div>
+            <div class="phone-btn" onclick="ussdPress(3)">3</div>
+          </div>
+        </div>
+        <p style="font-size:11px;color:var(--color-text-secondary);text-align:center;margin-top:8px">Works on ANY phone · No data needed · Instant response</p>
+      </div>
+
+      <div class="card">
+        <div class="card-hd"><span class="card-title">WhatsApp AI hotline · 0900-SIREN</span></div>
+        <div class="wa" id="wa-chat">
+          <div class="wa-msg wa-in">
+            Ẹ káàbọ̀! Welcome to SIREN. I can help you:<br>1️⃣ Report a crisis<br>2️⃣ Find shelter near you<br>3️⃣ Get safety tips<br>Send a number or describe what's happening.
+            <div class="wa-t">SIREN · 12:01</div>
+          </div>
+          <div class="wa-msg wa-out">There's fighting happening in my area, I'm scared<div class="wa-t">You · 12:03</div></div>
+          <div class="wa-msg wa-in">
+            I hear you — your safety is priority. I've flagged your location.<br><br>🔴 Your area is in an <strong>active alert zone</strong>.<br><br>📍 Nearest safe shelter: <strong>St. Patrick's Primary School, 0.4km</strong><br>📞 Emergency line: 112<br><br>Stay indoors. Do not use open roads. Help is coming.
+            <div class="wa-t">SIREN · 12:03</div>
+          </div>
+        </div>
+        <div style="display:flex;gap:6px;margin-top:8px">
+          <input type="text" placeholder="Type a message..." style="flex:1;font-size:12px;padding:7px 10px;border-radius:8px;border:0.5px solid var(--color-border-secondary);background:var(--color-background-primary);color:var(--color-text-primary);font-family:var(--font-sans)" id="wa-input" onkeydown="if(event.key==='Enter')sendWa()">
+          <button class="btn btn-primary" onclick="sendWa()" style="padding:7px 12px;font-size:12px">Send</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:12px">
+      <div class="card-title" style="margin-bottom:10px">Community report — submit anonymously</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;flex-wrap:wrap">
+        <div style="background:var(--color-background-secondary);border-radius:8px;padding:10px;text-align:center;cursor:pointer;border:0.5px solid var(--color-border-tertiary)" onclick="reportTap(this,'Violence / conflict')">
+          <i class="ti ti-sword" aria-hidden="true" style="font-size:20px;color:#EF4444"></i>
+          <div style="font-size:11px;margin-top:4px">Violence / conflict</div>
+        </div>
+        <div style="background:var(--color-background-secondary);border-radius:8px;padding:10px;text-align:center;cursor:pointer;border:0.5px solid var(--color-border-tertiary)" onclick="reportTap(this,'Disease / illness')">
+          <i class="ti ti-virus" aria-hidden="true" style="font-size:20px;color:#8B5CF6"></i>
+          <div style="font-size:11px;margin-top:4px">Disease / illness</div>
+        </div>
+        <div style="background:var(--color-background-secondary);border-radius:8px;padding:10px;text-align:center;cursor:pointer;border:0.5px solid var(--color-border-tertiary)" onclick="reportTap(this,'Flooding / disaster')">
+          <i class="ti ti-droplet" aria-hidden="true" style="font-size:20px;color:#3B82F6"></i>
+          <div style="font-size:11px;margin-top:4px">Flooding / disaster</div>
+        </div>
+        <div style="background:var(--color-background-secondary);border-radius:8px;padding:10px;text-align:center;cursor:pointer;border:0.5px solid var(--color-border-tertiary)" onclick="reportTap(this,'Missing person')">
+          <i class="ti ti-user-search" aria-hidden="true" style="font-size:20px;color:#F59E0B"></i>
+          <div style="font-size:11px;margin-top:4px">Missing person</div>
+        </div>
+        <div style="background:var(--color-background-secondary);border-radius:8px;padding:10px;text-align:center;cursor:pointer;border:0.5px solid var(--color-border-tertiary)" onclick="reportTap(this,'Food / water shortage')">
+          <i class="ti ti-shopping-cart" aria-hidden="true" style="font-size:20px;color:#10B981"></i>
+          <div style="font-size:11px;margin-top:4px">Food / water shortage</div>
+        </div>
+        <div style="background:var(--color-background-secondary);border-radius:8px;padding:10px;text-align:center;cursor:pointer;border:0.5px solid var(--color-border-tertiary)" onclick="reportTap(this,'Other')">
+          <i class="ti ti-dots" aria-hidden="true" style="font-size:20px;color:#6B7280"></i>
+          <div style="font-size:11px;margin-top:4px">Other</div>
+        </div>
+      </div>
+      <div id="report-confirm" style="display:none;margin-top:10px;padding:10px;background:#DCFCE7;border-radius:8px;font-size:12px;color:#166534"></div>
+    </div>
+  </div>
+
+  <!-- PREDICT -->
+  <div class="panel" id="panel-predict">
+    <div class="g2">
+      <div class="card">
+        <div class="card-hd"><span class="card-title">72-hr threat forecast</span></div>
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <div style="padding:10px;background:#FEE2E2;border-radius:8px;border-left:3px solid #EF4444">
+            <div style="font-size:12px;font-weight:500;color:#991B1B">HIGH risk — Plateau State</div>
+            <div style="font-size:11px;color:#B91C1C;margin-top:2px">Communal conflict · 88% confidence · 24–48 hrs</div>
+            <div style="font-size:11px;color:#991B1B;margin-top:4px">Signals: social media spike +340%, 3 local radio mentions, 2 security reports</div>
+          </div>
+          <div style="padding:10px;background:#FEF3C7;border-radius:8px;border-left:3px solid #F59E0B">
+            <div style="font-size:12px;font-weight:500;color:#92400E">MEDIUM risk — Kano North</div>
+            <div style="font-size:11px;color:#B45309;margin-top:2px">Disease outbreak · 67% confidence · 48–72 hrs</div>
+            <div style="font-size:11px;color:#92400E;margin-top:4px">Signals: hospital OPD spike +22%, water quality drop, sanitation reports</div>
+          </div>
+          <div style="padding:10px;background:#FEF3C7;border-radius:8px;border-left:3px solid #F59E0B">
+            <div style="font-size:12px;font-weight:500;color:#92400E">MEDIUM risk — Lokoja (Kogi)</div>
+            <div style="font-size:11px;color:#B45309;margin-top:2px">Flash flooding · 74% confidence · 12–24 hrs</div>
+            <div style="font-size:11px;color:#92400E;margin-top:4px">Signals: rainfall 180% above average, Niger River gauge +1.4m overnight</div>
+          </div>
+          <div style="padding:10px;background:#F0FDF4;border-radius:8px;border-left:3px solid #22C55E">
+            <div style="font-size:12px;font-weight:500;color:#166534">LOW risk — Lagos metro</div>
+            <div style="font-size:11px;color:#15803D;margin-top:2px">General stability · routine monitoring active</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title" style="margin-bottom:12px">Prediction model inputs</div>
+        <div class="pb-row"><div class="pb-label"><span>Historical conflict patterns</span><span>High weight</span></div><div class="pb-track"><div class="pb-fill" style="width:90%;background:#7C3AED"></div></div></div>
+        <div class="pb-row"><div class="pb-label"><span>Social media sentiment</span><span>High weight</span></div><div class="pb-track"><div class="pb-fill" style="width:85%;background:#2563EB"></div></div></div>
+        <div class="pb-row"><div class="pb-label"><span>Economic stress index</span><span>Med weight</span></div><div class="pb-track"><div class="pb-fill" style="width:65%;background:#D97706"></div></div></div>
+        <div class="pb-row"><div class="pb-label"><span>Weather & environment</span><span>Med weight</span></div><div class="pb-track"><div class="pb-fill" style="width:60%;background:#059669"></div></div></div>
+        <div class="pb-row"><div class="pb-label"><span>Disease surveillance</span><span>Med weight</span></div><div class="pb-track"><div class="pb-fill" style="width:55%;background:#DC2626"></div></div></div>
+        <div class="pb-row"><div class="pb-label"><span>Market price anomalies</span><span>Low weight</span></div><div class="pb-track"><div class="pb-fill" style="width:35%;background:#9333EA"></div></div></div>
+        <div class="divider"></div>
+        <div class="card-title" style="margin-bottom:10px">Model accuracy</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+          <div style="text-align:center;padding:8px;background:var(--color-background-secondary);border-radius:8px">
+            <div style="font-size:20px;font-weight:500;color:#16A34A">79%</div>
+            <div style="font-size:11px;color:var(--color-text-secondary)">48hr accuracy</div>
+          </div>
+          <div style="text-align:center;padding:8px;background:var(--color-background-secondary);border-radius:8px">
+            <div style="font-size:20px;font-weight:500;color:#2563EB">91%</div>
+            <div style="font-size:11px;color:var(--color-text-secondary)">24hr accuracy</div>
+          </div>
+          <div style="text-align:center;padding:8px;background:var(--color-background-secondary);border-radius:8px">
+            <div style="font-size:20px;font-weight:500;color:#D97706">63%</div>
+            <div style="font-size:11px;color:var(--color-text-secondary)">72hr accuracy</div>
+          </div>
+          <div style="text-align:center;padding:8px;background:var(--color-background-secondary);border-radius:8px">
+            <div style="font-size:20px;font-weight:500;color:#7C3AED">2.4M</div>
+            <div style="font-size:11px;color:var(--color-text-secondary)">lives protected</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+function tab(el, id) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('panel-'+id).classList.add('active');
+}
+
+const threats = [
+  { title:'Communal tension — Plateau State', status:'CRITICAL', color:'#EF4444', detail:'Armed youths gathering reported in 3 LGAs. Historical conflict pattern match: 88%. Recommend: deploy peace committee, alert security forces, pre-position medical teams.', actions:['Brief security forces','Contact traditional rulers','Broadcast peace message'] },
+  { title:'Cholera outbreak signal — Kano LGA', status:'WATCH', color:'#F59E0B', detail:'OPD attendance up 22% in 2 clinics. Water quality reports flagged. Similar to 2019 Kano outbreak pattern. Recommend: deploy NCDC rapid response, alert 5 hospitals.', actions:['Alert NCDC teams','Issue water safety broadcast','Pre-position ORS supplies'] },
+  { title:'Flash flood risk — Lokoja', status:'WATCH', color:'#F59E0B', detail:'Niger River gauge +1.4m in 12hrs. Rainfall 180% above seasonal average. 4,000 residents in low-lying zones. Recommend: pre-position evacuation boats, open shelters.', actions:['Open 3 shelters','Alert riverside residents','Deploy NEMA teams'] },
+  { title:'Food scarcity — NE Borno (resolved)', status:'RESOLVED', color:'#22C55E', detail:'WFP distribution completed. 18,000 beneficiaries received aid. Situation stable. Monitoring continues for 30 days.', actions:['View full report','Archive case','Continue monitoring'] },
+];
+
+function zoomThreat(i) {
+  const t = threats[i];
+  const el = document.getElementById('threat-detail');
+  el.style.display = 'block';
+  el.innerHTML = `<div class="card" style="border-left:3px solid ${t.color}">
+    <div style="font-size:14px;font-weight:500;color:var(--color-text-primary);margin-bottom:6px">${t.title}</div>
+    <div style="font-size:12px;color:var(--color-text-secondary);line-height:1.6;margin-bottom:10px">${t.detail}</div>
+    <div style="display:flex;gap:6px;flex-wrap:wrap">${t.actions.map(a=>`<button class="btn" style="font-size:11px;padding:5px 10px">${a}</button>`).join('')}</div>
+  </div>`;
+}
+
+const feedItems = [
+  { text:'Twitter/X: Multiple reports of gunshots heard in Riyom, Plateau State', src:'Social · 2 min ago', cls:'red' },
+  { text:'Radio NTA: "Residents urged to remain calm following disturbances..." (AI transcribed)', src:'Radio · 5 min ago', cls:'amber' },
+  { text:'WhatsApp report: Market closed early, people running, Kangang area', src:'Citizen · 7 min ago', cls:'red' },
+  { text:'NIMET: Kogi river gauge reading 9.8m — WARNING threshold exceeded', src:'Weather · 12 min ago', cls:'amber' },
+  { text:'NCDC: 14 new watery diarrhea cases at Murtala Hospital, Kano', src:'Health · 18 min ago', cls:'amber' },
+  { text:'Facebook group "Plateau Residents": "Stay indoors, soldiers deployed"', src:'Social · 22 min ago', cls:'red' },
+  { text:'Citizen USSD report: Flooding at Low-cost housing estate, Lokoja #2', src:'USSD · 31 min ago', cls:'amber' },
+  { text:'Twitter: Rumors circulating about cattle rustling attack — AI flagged as unverified', src:'Social · 36 min ago', cls:'amber' },
+  { text:'Market price anomaly: Tomato +45% in 3 days, Kano wholesale market', src:'Market data · 44 min ago', cls:'amber' },
+  { text:'Abuja: Labour union protest remains peaceful, 3,200 attendees tracked', src:'Social · 52 min ago', cls:'green' },
+  { text:'Borno: WFP confirms food distribution complete — 18,000 beneficiaries', src:'NGO report · 1 hr ago', cls:'green' },
+];
+
+const feed = document.getElementById('signal-feed');
+feedItems.forEach(f => {
+  const d = document.createElement('div');
+  d.className = `feed-item ${f.cls}`;
+  d.innerHTML = `<div>${f.text}</div><div class="feed-src">${f.src}</div>`;
+  feed.appendChild(d);
+});
+
+const ussdScreens = {
+  1: '> 1 selected\n\nReport emergency\nDescribe location:\n\n1. My current LGA\n2. Type location\n3. Auto-detect\n\n[Your report is ANONYMOUS]',
+  2: '> 2 selected\n\nEvacuation request\nregistered.\n\nNearest pickup:\nJos Teaching Hospital\n2.1km from you\n\nETA: 18 minutes\nCall: 0800-SIREN-1',
+  3: '> 3 selected\n\nNearest shelters:\n1. St Patrick School\n   0.4km - 120 capacity\n2. Riyom LG Hall\n   1.2km - 80 capacity\n\nSend 1 or 2 to confirm'
+};
+
+function ussdPress(n) {
+  const sc = document.getElementById('ussd-screen');
+  sc.innerHTML = `<span style="color:#0f0;white-space:pre-line">${ussdScreens[n] || '> '+n+'\n\nProcessing...'}</span>`;
+}
+
+const waReplies = {
+  '1': '📍 To report a crisis, please tell me:\n\n1. What is happening?\n2. Where are you now?\n\nYour identity is protected.',
+  '2': '🏠 Finding shelters near you...\n\nNearest safe locations:\n📍 Jos University Guest House — 1.2km\n📍 Riyom Community Hall — 2.8km\n\nRoutes are passable. Avoid Market Road.',
+  '3': '🛡️ Safety tips:\n\n• Stay indoors & lock doors\n• Avoid social media rumours\n• Keep phone charged\n• Emergency: Call 112\n• Silent help: Send "HELP" here anytime',
+  'default': '✅ Message received. A safety coordinator has been notified.\n\nIf this is a life emergency, dial 112 or send "PANIC" for immediate response.'
+};
+
+function sendWa() {
+  const inp = document.getElementById('wa-input');
+  const msg = inp.value.trim();
+  if (!msg) return;
+  const chat = document.getElementById('wa-chat');
+  const t = new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
+  chat.innerHTML += `<div class="wa-msg wa-out">${msg}<div class="wa-t">You · ${t}</div></div>`;
+  inp.value = '';
+  const reply = waReplies[msg] || waReplies['default'];
+  setTimeout(() => {
+    chat.innerHTML += `<div class="wa-msg wa-in">${reply}<div class="wa-t">SIREN · ${t}</div></div>`;
+    chat.scrollTop = chat.scrollHeight;
+  }, 800);
+}
+
+function reportTap(el, type) {
+  const c = document.getElementById('report-confirm');
+  c.style.display = 'block';
+  c.innerHTML = `✅ <strong>${type}</strong> report received anonymously. AI is processing. A coordinator will be alerted within 2 minutes. Thank you for keeping your community safe.`;
+}
+
+function panicDemo() {
+  const t = document.getElementById('panel-response');
+  document.querySelectorAll('.tab').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  t.classList.add('active');
+  document.querySelectorAll('.tab')[2].classList.add('active');
+  alert('🚨 PANIC SIGNAL RECEIVED\nLocation triangulated.\nEmergency contacts alerted.\nNearest responder: 4 min away.\n\nStay calm. Help is coming.');
+}
+</script>
+</div>
+</body>
+</html>
